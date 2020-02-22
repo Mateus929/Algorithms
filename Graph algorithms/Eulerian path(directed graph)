@@ -26,8 +26,7 @@ int main(){
     }
     int start=1,odd=0;
     for(int i=1;i<=n;i++){
-        if(deg[i]!=0)
-        {
+        if(deg[i]!=0){
             odd++;
             if(deg[i]>0)
                 start=i;
