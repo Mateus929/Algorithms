@@ -1,0 +1,69 @@
+#include<bits/stdc++.h>
+
+using namespace std;
+
+vector<int> g[100001],P(100001),deph(100001);
+int A[100001][22];
+
+void dfs(int v,int e=-1){
+    P[v]=e;
+    for(int u:g[v])
+        if(u!=e){
+            deph[u]=deph[v]+1;
+            dfs(u,v);
+        }
+}
+
+void preper(int n,int root){
+    deph[root]=0;
+    dfs(root);
+    for(int i=1;i<=n;i++)
+        for(int j=0;j<=20;j++)
+            if(j==0)
+                A[i][j]=P[i];
+            else
+                A[i][j]=-1;
+    for(int j=1;j<=20;j++)
+        for(int i=1;i<=n;i++)
+            if(A[i][j-1]!=-1)
+                A[i][j]=A[A[i][j-1]][j-1];
+}
+
+int LCA(int v,int u){
+    if(deph[u]<deph[v])
+        swap(u,v);
+    int k=deph[u]-deph[v];
+    while(k>0){
+        int t=log2(k);
+        u=A[u][t];
+        k-=(1<<t);
+    }
+    if(u==v)
+        return u;
+    for(int j=20;j>=0;j--){
+        if(A[v][j]!=A[u][j]){
+            v=A[v][j];
+            u=A[u][j];
+        }
+    }
+    return P[v];
+}
+
+int main(){
+    int n;
+    cin >> n;
+    for(int i=1;i<n;i++){
+        int v,u;
+        cin >> v >> u;
+        g[v].push_back(u);
+        g[u].push_back(v);
+    }
+    preper(n,1);
+    int Q;
+    cin >> Q;
+    while(Q--){
+        int v,u;
+        cin >> v >> u;
+        cout << LCA(v,u) << endl;
+    }
+}
