@@ -4,7 +4,7 @@
 #define ss second
 #define INF INT_MAX
 
-using namespace std;\
+using namespace std;
 
 vector<pii> g[201];
 int cap[201][201];
