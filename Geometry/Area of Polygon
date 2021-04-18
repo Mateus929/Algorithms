@@ -15,7 +15,7 @@ double area(vector<point> &a){
         point q=a[i];
         ans+=(p.x-q.x)*(p.y+q.y);
     }
-    return ans/2;
+    return abs(ans)/2;
 }
 
 int main(){
