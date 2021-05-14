@@ -1,36 +1,31 @@
 #include<bits/stdc++.h>
 #define ll long long
-
 using namespace std;
-
-vector<int> t(400001);
-
-void build(vector<int> &a,int v,int tl,int tr){
+ll a[100001],t[400000];
+void build(int v,int tl,int tr){
     if(tl==tr)
         t[v]=a[tl];
     else{
         int tm=(tl+tr)/2;
-        build(a,v*2,tl,tm);
-        build(a,v*2+1,tm+1,tr);
+        build(v*2,tl,tm);
+        build(v*2+1,tm+1,tr);
         t[v]=t[v*2]+t[v*2+1];
     }
 }
-
-int get(int v,int tl,int tr,int l,int r){
-    if(tl==l && r==tr)
+ll query(int v,int tl,int tr,int l,int r){
+    if(l<=tl && tr<=r)
         return t[v];
+    if(tr<l || r<tl)
+        return 0;
     int tm=(tl+tr)/2;
-    if(r<=tm)
-        return get(v*2,tl,tm,l,r);
-    if(l>tm)
-        return get(v*2+1,tm+1,tr,l,r);
-    return get(v*2,tl,tm,l,tm) +
-           get(v*2+1,tm+1,tr,tm+1,r);
+    return query(v*2,tl,tm,l,r)+
+           query(v*2+1,tm+1,tr,l,r);
 }
-
-void update(int v,int tl,int tr,int pos,int val){
-    if(tl==tr)
+void update(int v,int tl,int tr,int pos,ll val){
+    if(tl==tr){
+        a[tl]=val;
         t[v]=val;
+    }
     else{
         int tm=(tl+tr)/2;
         if(pos<=tm)
@@ -40,28 +35,24 @@ void update(int v,int tl,int tr,int pos,int val){
         t[v]=t[v*2]+t[v*2+1];
     }
 }
-
 int main(){
-    int n;
-    cin >> n;
-    vector<int> a(n+1);
+    int n,Q;
+    cin >> n >> Q;
     for(int i=1;i<=n;i++)
         cin >> a[i];
-    build(a,1,1,n);
-    int Q;
-    cin >>  Q;
+    build(1,1,n);
     while(Q--){
-        char c;
-        cin >> c;
-        if(c=='u'){
-            int val,pos;
-            cin >> val >> pos;
-            update(1,1,n,val,pos);
+        char cmd;
+        cin >> cmd;
+        if(cmd=='u'){
+            int pos,val;
+            cin >> pos >> val;
+            update(1,1,n,pos,val);
         }
-        else{
+        if(cmd=='s'){
             int l,r;
             cin >> l >> r;
-            cout << get(1,1,n,l,r) << endl;
+            cout << query(1,1,n,l,r) << endl;
         }
     }
 }
