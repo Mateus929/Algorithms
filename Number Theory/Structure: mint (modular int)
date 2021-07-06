@@ -1,0 +1,75 @@
+#include<bits/stdc++.h>
+#define ll long long
+#define ull unsigned ll
+#define pii pair<int,int>
+#define pll pair<ll,ll>
+#define ff first
+#define ss second
+#define pb push_back
+#define INF INT_MAX
+
+using namespace std;
+
+ll phi(ll n){
+    ll ans=n;
+    for(ll i=2;i*i<=n;i++){
+        if(n%i==0)
+            ans-=ans/i;
+        while(n%i==0)
+            n/=i;
+    }
+    return (n>1) ? ans-ans/n : ans;
+}
+
+template<ll mod> struct mint{
+    ll v;
+    explicit operator ll() const {return v;}
+    mint(){v=0;}
+    mint(ll v) : v(v) {v%=mod;}
+    void read() {cin >> v; v%=mod;}
+    friend bool operator==(mint& a,mint& b) {return a.v==b.v;}
+	friend bool operator!=(mint& a,mint& b) {return !(a==b);}
+	friend bool operator<(mint& a,mint& b)  {return a.v<b.v;}
+    mint& operator+=(mint& x){v+=x.v; v%=mod; return *this;}
+	mint& operator-=(mint& x){v-=x.v; if(v<0)v+=mod; return *this;}
+	mint& operator*=(mint& x){(mod>1e9) ? v=mult(v,x.v) : v=(v*x.v)%mod; return *this;}
+	mint& operator/=(mint& x) {v*=inverse(x).v; return *this;}
+	mint operator-() const {return mint(-v);}
+	mint& operator++(){return *this +=1;}
+	mint& operator--(){return *this -=1;}
+    friend mint& operator+ (mint a,mint &b) {return a+=b;}
+    friend mint& operator- (mint a,mint &b) {return a-=b;}
+    friend mint& operator* (mint a,mint &b) {return a*=b;}
+    friend mint& operator/ (mint a,mint &b) {return a/=b;}
+    friend mint pow(mint a,ll n){
+        mint ans=1;
+        while(n>0){
+            if(n&1)
+                ans*=a;
+            a*=a; n/=2;
+        }
+        return ans;
+    }
+    ll mult(ll a,ll b){
+        if(b==1)
+            return a%mod;
+        ll x=mult(a,b/2);
+        x+=x; x%=mod;
+        if(b&1)
+            return (a+x)%mod;
+        return x;
+    }
+    friend mint inverse(mint &x){
+        if(__gcd(x.v,mod)!=1)
+            return -1;
+        return pow(x,phi(mod)-1);
+    }
+};
+
+main(){
+    int T;
+    cin >> T;
+    while(T--){
+
+    }
+}
