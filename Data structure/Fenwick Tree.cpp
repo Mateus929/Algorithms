@@ -3,15 +3,15 @@
 
 using namespace std;
 
-const int MAXN=100001;
-ll fenwik[100001];
-int v2(int indx){
+const int NMAX=100001;
+ll fenwik[NMAX];
+int lsb(int indx){
     return indx&-indx;
 }
 void update(int indx,ll val,int n){
     while(indx<=n){
         fenwik[indx]+=val;
-        indx+=v2(indx);
+        indx+=lsb(indx);
     }
 }
 void build(ll a[],int n){
@@ -22,7 +22,7 @@ ll query(int indx){
     ll ans=0;
     while(indx>0){
         ans+=fenwik[indx];
-        indx-=v2(indx);
+        indx-=lsb(indx);
     }
     return ans;
 }
