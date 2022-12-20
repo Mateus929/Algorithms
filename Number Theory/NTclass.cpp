@@ -235,7 +235,7 @@ public:
                 x /= i;
             }
         }
-        return last;
+        return max(last, x);
     }
 
     void factorize(ll x, vector<pair<ll, int>> factors) {
