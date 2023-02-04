@@ -1,8 +1,5 @@
 #include <bits/stdc++.h>
-#define ll long long
-#define ff first
-#define second
-#define pb push_back
+
 
 using namespace std;
 
