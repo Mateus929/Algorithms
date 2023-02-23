@@ -83,8 +83,8 @@ public:
         build(1, 1, n, a);
     }
     ~segTree() {
-        delete []t;
-        delete []lazy;
+        delete[] t;
+        delete[] lazy;
     }
     T query(int l, int r) {
         return query(1, 1, n, l, r);
