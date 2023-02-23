@@ -65,7 +65,7 @@ private:
         }
         if(l <= tm && tm < r) {
             update(v * 2, tl, tm, l, tm, val),
-                    update(v * 2 + 1, tm + 1, tr, tm + 1, r, val);
+            update(v * 2 + 1, tm + 1, tr, tm + 1, r, val);
         }
         t[v] = comb(t[v * 2], t[v * 2 + 1]);
     }
