@@ -6,7 +6,7 @@ using namespace std;
 class DSU {
 private:
     int *sz, *p;
-protected:
+public:
     DSU(int n) {
         sz = new int[n + 1];
         p = new int [n + 1];
