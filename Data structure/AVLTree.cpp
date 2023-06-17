@@ -1,3 +1,4 @@
+// works but remove function calls left and right rotations incorrectly without it gives run time error
 #include <bits/stdc++.h>
 #define ll long long
 #define pii pair<int, int>
@@ -12,11 +13,11 @@ class BST {
 private:
     struct Node {
         T val;
-        int height, len = 0;
+        int height = 0, cnt = 0, len = 0;
         Node *left, *right;
         Node(T val = 0) : val(val) {
             left = right = nullptr;
-            height = len = 1;
+            height = len = cnt = 1;
         }
     };
     void deleteDFS(Node *v) {
@@ -37,7 +38,7 @@ private:
         int l = 0, r = 0;
         if(node -> left != nullptr) l = node -> left -> len;
         if(node -> right != nullptr) r = node -> right -> len;
-        node -> len = l + r + 1;
+        node -> len = l + r + node -> cnt;
     }
     int balanceFactor(Node *node) {
         if(node == nullptr) return 0;
@@ -48,6 +49,9 @@ private:
     }
     Node *rightRotation(Node *x) {
         Node *y = x -> left;
+        if(y == nullptr) {
+            return x;
+        }
         Node *temp = y -> right;
         // rotate
         y -> right = x;
@@ -63,6 +67,9 @@ private:
     }
     Node *leftRotation(Node *x) {
         Node *y = x -> right;
+        if(y == nullptr) {
+            return x;
+        }
         Node *temp = y -> left;
         // rotate
         y -> left = x;
@@ -90,9 +97,13 @@ private:
             return node;
         }
         // recursion
-        if(val <= node -> val) {
+        if(val == node -> val) {
+            node -> cnt++;
+        }
+        if(val < node -> val) {
             node -> left = insert(node -> left, val);
-        } else {
+        }
+        if(val > node -> val) {
             node -> right = insert(node -> right, val);
         }
         // update values
@@ -101,7 +112,7 @@ private:
         // balance
         int factor = balanceFactor(node);
         // case 1 : LL
-        if(factor > 1 && val <= node -> left -> val) {
+        if(factor > 1 && val < node -> left -> val) {
             return rightRotation(node);
         }
         // case 2 : RR
@@ -110,33 +121,38 @@ private:
         }
         // case 3 : LR
         if(factor > 1) {
-            node -> left = leftRotation(node);
+            node -> left = leftRotation(node -> left);
             return rightRotation(node);
         }
         // case 4 : RL
         if(factor < -1) {
-            node -> right = rightRotation(node);
+            node -> right = rightRotation(node -> right);
             return leftRotation(node);
         }
         // no rotation
         return node;
     }
-    Node *remove(Node *node, T val, bool ind = false) {
+    Node *remove(Node *node, T val) {
         if(node == nullptr) return node;
         if(val < node -> val) node -> left = remove(node -> left, val);
         if(node -> val < val) node -> right = remove(node -> right, val);
-        if(ind && node -> left != nullptr && node -> val == val) node -> left = remove(node -> left, val);
-        else if(node -> val == val) {
-            if(node -> left == nullptr || node -> right == nullptr) {
-                Node *child = nullptr;
-                if(node -> left != nullptr) child = node -> left;
-                if(node -> right != nullptr) child = node -> right;
-                delete node;
-                node = child;
-            } else {
-                Node *child = successor(node -> right);
-                node -> val = child -> val;
-                node -> right = remove(node -> right, child -> val, true);
+        if(node -> val == val) {
+            node -> cnt--;
+            if(node -> cnt == 0) {
+                if(node -> left == nullptr || node -> right == nullptr) {
+                    Node *child = nullptr;
+                    if(node -> left != nullptr) child = node -> left;
+                    if(node -> right != nullptr) child = node -> right;
+                    Node *temp = node;
+                    node = child;
+                    delete temp;
+                } else {
+                    Node *child = successor(node -> right);
+                    node -> val = child -> val;
+                    node -> cnt = child -> cnt;
+                    child -> cnt = 1;
+                    node -> right = remove(node -> right, child -> val);
+                }
             }
         }
         if(node == nullptr) return node;
@@ -149,12 +165,12 @@ private:
         if(factor < -1 && balanceFactor(root -> right) <= 0) {
             return leftRotation(node);
         }
-        if(factor > 1) {
-            node -> left = leftRotation(node);
+        if(factor > 1 && balanceFactor(root -> left) < 0) {
+            node -> left = leftRotation(node -> left);
             return rightRotation(node);
         }
-        if(factor < -1) {
-            node -> right = rightRotation(node);
+        if(factor < -1 && balanceFactor(root -> right) > 0) {
+            node -> right = rightRotation(node -> right);
             return leftRotation(node);
         }
         return node;
@@ -170,25 +186,32 @@ public:
         deleteDFS(root);
     }
     void insert(T val) {
-        root = insert(root, val);
         n++;
+        root = insert(root, val);
     }
     void remove(T val) {
-        if(!find(val)) return;
-        root = remove(root, val);
+        if(find(val) == 0) return;
         n--;
+        if(n == 0) {
+            root = nullptr;
+            return;
+        }
+        root = remove(root, val);
     }
-    bool find(T val) {
+    int find(T val) {
+        if(n == 0) return 0;
         Node *cur = root;
         while(cur != nullptr) {
-            if(cur -> val == val) return true;
+            if(cur -> val == val) {
+                return cur -> cnt;
+            }
             if(val < cur -> val) {
                 cur = cur -> left;
             } else {
                 cur = cur -> right;
             }
         }
-        return false;
+        return 0;
     }
     T findKth(int k) {
         if(n == 0 || k <= 0) {
@@ -204,8 +227,8 @@ public:
                 }
                 k -= cur -> left -> len;
             }
-            k--;
-            if(k == 0) return cur -> val;
+            k -= cur -> cnt;
+            if(k <= 0) return cur -> val;
             cur = cur -> right;
         }
         return cur -> val;
@@ -218,21 +241,71 @@ public:
     }
 };
 
-const int N = 524289, mod = 998244353, INF = 1e9 + 1; // !!!
+multiset<int> st;
 
-int main() {
-    BST<int> bt;
-    for(int i = 1; i <= 7; i++) {
-        int x;
-        cin >> x;
-        bt.insert(x);
+int find_kth(int k)  {
+    for(int u : st) {
+        k--;
+        if(k == 0) return u;
     }
-    for(int i = 1; i <= 2; i++) {
-        int x;
-        cin >> x;
-        bt.remove(x);
-    }
-    cout << bt.findKth(3);
+    return -1;
 }
 
-// project has bugs and is yet to be completed
+void print() {
+    cout << "Printing multiset...\n";
+    for(int u : st) cout << u << " ";
+    cout << "\n....";
+}
+
+int main() {
+    mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+    BST<int> bt;
+    bt.insert(3);
+    bt.remove(3);
+    int Q;
+    cin >> Q;
+    int cnt = 0;
+    for(int i = 1; i <= Q; i++) {
+        int x = rng() % 10;
+        int ind = rng() % 2;
+        if(ind == 0) {
+            bt.insert(x);
+            st.insert(x);
+        } else {
+            multiset<int> :: iterator it = st.find(x);
+            bool isIn = bt.find(x);
+            if(isIn && it == st.end()) {
+                cout << "Step " << i << ": The element wasn't erased";
+                return 0;
+            }
+            if(it != st.end()) {
+                if(!isIn) {
+                    cout << "Step " << i << ": The element was erased for no reason";
+                    return 0;
+                }
+                st.erase(it);
+            }
+            bt.remove(x);
+            if(isIn) cnt++;
+            if(bt.find(x) != st.count(x)) {
+                cout << "Step " << i << ": didn't count elements correctly!\n";
+                return 0;
+            }
+        }
+        if(bt.size() != st.size()) {
+            cout << "Step " << i << ": Sizes dont match! ";
+            cout << "Error is " << bt.size() - st.size() << "\n";
+            return 0;
+        }
+        int n = st.size();
+        if(n == 0) continue;
+        int k = rng() % n;
+        k++;
+        if(bt.findKth(k) != find_kth(k)) {
+            cout << "Step " << i << ": " <<  k << "th element didn't match!\n";
+            return 0;
+        }
+    }
+    cout << "Everything is fine!\n";
+    cout << "Number of elements removal = " << cnt;
+}
