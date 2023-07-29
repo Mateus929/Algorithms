@@ -7,6 +7,7 @@ private:
     int n;
     T *t, *lazy;
     // To modify segTree, just modify comb and upd.
+    // lazy[v] stores 0 initialy, in case of update change it.
     T comb(T a, T b) {
         return a + b;
     }
