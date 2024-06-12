@@ -37,7 +37,7 @@ int main() {
         if(ans.size() == 0) cout << "Not Found\n";
         else {
             cout << ans.size() << "\n";
-            for(int u : ans) cout << u + 1 << " ";
+            for(int u: ans) cout << u + 1 << " ";
             cout << "\n";
         }
     }
